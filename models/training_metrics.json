@@ -1,0 +1,30 @@
+{
+  "architecture": "ConvNeXt-Tiny",
+  "device": "cpu",
+  "class_to_index": {
+    "Damaged Building": 0,
+    "Undamaged Building": 1
+  },
+  "image_counts": {
+    "Damaged Building": 1237,
+    "Undamaged Building": 1500
+  },
+  "split_counts": {
+    "train": 1915,
+    "validation": 411,
+    "test": 411
+  },
+  "best_validation_loss": 0.050352279685999646,
+  "test_loss": 0.048185681140190784,
+  "test_accuracy": 0.9854014598540146,
+  "test_confusion_matrix": [
+    [
+      184,
+      2
+    ],
+    [
+      4,
+      221
+    ]
+  ]
+}
