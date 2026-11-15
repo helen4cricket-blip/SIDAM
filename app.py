@@ -14,6 +14,7 @@ from train_damage_classifier import make_model
 
 
 WORKSPACE = Path(__file__).resolve().parent
+APP_TITLE = "Seismic Infrastructure Damage Assessment Model"
 CHECKPOINT_PATH = WORKSPACE / "models" / "damage_convnext_tiny.pth"
 METRICS_PATH = WORKSPACE / "models" / "training_metrics.json"
 
@@ -130,8 +131,56 @@ h1, h2, h3 {
     color: var(--plum) !important;
 }
 
+[data-testid="stMain"] h1 {
+    font-size: clamp(1rem, 2.1vw, 1.8rem) !important;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.sidam-acronym {
+    color: var(--magenta);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, var(--plum), var(--charcoal));
+}
+
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has([data-testid="stRadio"]) {
+    width: 100%;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"],
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadioOption"] {
+    background-color: rgba(247, 241, 227, 0.08);
+    border: 1px solid rgba(247, 241, 227, 0.45);
+    border-radius: 0.4rem;
+    box-sizing: border-box;
+    padding: 0.7rem 0.9rem;
+    transition: background-color 140ms ease, border-color 140ms ease;
+    width: 100%;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover {
+    background-color: rgba(184, 47, 108, 0.35);
+    border-color: var(--terracotta);
+}
+
+[data-testid="stSidebar"] [data-testid="stRadioOption"][data-selected="true"] {
+    background-color: var(--magenta);
+    border-color: var(--ivory);
 }
 
 [data-testid="stSidebar"] * {
@@ -222,8 +271,14 @@ def load_model(checkpoint_path: str) -> tuple[nn.Module, list[str], torch.device
     return model, class_names, device
 
 
+def render_page_title() -> None:
+    st.title(APP_TITLE)
+    st.markdown('<div class="sidam-acronym">SIDAM</div>', unsafe_allow_html=True)
+
+
 def render_team_page() -> None:
-    st.title("The SIDAM team")
+    render_page_title()
+    st.subheader("The SIDAM team")
     st.write(
         "Meet the developer and academic supervisors behind this building "
         "damage classifier."
@@ -256,7 +311,7 @@ def render_team_page() -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Building Damage Classifier",
+        page_title=APP_TITLE,
         page_icon="🏚️",
         layout="wide",
     )
@@ -264,7 +319,7 @@ def main() -> None:
 
     selected_page = st.sidebar.radio(
         "Navigation",
-        ("Classifier", "TEAM"),
+        ("Model", "TEAM"),
         label_visibility="collapsed",
     )
     st.sidebar.divider()
@@ -272,7 +327,7 @@ def main() -> None:
         render_team_page()
         return
 
-    st.title("Building Damage Classifier")
+    render_page_title()
     st.write(
         "Upload up to 10 images at once to classify each as **Damaged Building** or "
         "**Undamaged Building**."
@@ -295,10 +350,6 @@ def main() -> None:
                 f"{test_accuracy:.1%}",
                 help="Measured on a held-out split from this same dataset.",
             )
-
-    st.sidebar.header("About this model")
-    st.sidebar.write("Architecture: ConvNeXt-Tiny")
-    st.sidebar.write("Runs locally in this workspace.")
 
     uploaded_files = st.file_uploader(
         "Choose up to 10 images",

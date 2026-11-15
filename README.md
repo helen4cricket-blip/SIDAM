@@ -1,12 +1,13 @@
-# Building Damage Classifier
+# Seismic Infrastructure Damage Assessment Model
 
 A Streamlit app that uses a trained ConvNeXt-Tiny model to classify an aerial
 image as `Damaged Building` or `Undamaged Building`. The app accepts up to 10
 images per upload and shows a separate prediction for each image.
 
 The interface uses a plum, magenta, terracotta, ivory, and charcoal palette.
-The sidebar includes a TEAM page featuring the developer and academic
-supervisors.
+The sidebar provides rectangular Model and TEAM navigation panes. Both pages
+use the title **Seismic Infrastructure Damage Assessment Model**, and the TEAM
+page features the developer and academic supervisors.
 
 ## Run locally
 
