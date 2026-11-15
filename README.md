@@ -1,7 +1,8 @@
 # Building Damage Classifier
 
 A Streamlit app that uses a trained ConvNeXt-Tiny model to classify an aerial
-image as `Damaged Building` or `Undamaged Building`.
+image as `Damaged Building` or `Undamaged Building`. The app accepts up to 10
+images per upload and shows a separate prediction for each image.
 
 ## Run locally
 

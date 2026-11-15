@@ -44,7 +44,7 @@ def main() -> None:
     )
     st.title("Building Damage Classifier")
     st.write(
-        "Upload an aerial image to classify it as **Damaged Building** or "
+        "Upload up to 10 images at once to classify each as **Damaged Building** or "
         "**Undamaged Building**."
     )
     st.warning(
@@ -70,44 +70,64 @@ def main() -> None:
     st.sidebar.write("Architecture: ConvNeXt-Tiny")
     st.sidebar.write("Runs locally in this workspace.")
 
-    uploaded_file = st.file_uploader(
-        "Choose an image",
+    uploaded_files = st.file_uploader(
+        "Choose up to 10 images",
         type=["jpg", "jpeg", "png", "tif", "tiff"],
-        help="Supported formats: JPG, PNG, and TIFF.",
+        accept_multiple_files=True,
+        help="Select up to 10 JPG, PNG, or TIFF images in one upload.",
     )
-    if uploaded_file is None:
-        st.info("Choose an image to see the model's prediction.")
+    if not uploaded_files:
+        st.info("Choose one or more images to see the model's predictions.")
         return
 
-    try:
-        image = Image.open(io.BytesIO(uploaded_file.getvalue())).convert("RGB")
-    except (UnidentifiedImageError, OSError) as error:
-        st.error(f"Could not read the uploaded image: {error}")
+    if len(uploaded_files) > 10:
+        st.error(
+            f"You selected {len(uploaded_files)} files. Please upload no more than 10 at once."
+        )
+        return
+
+    valid_uploads: list[tuple[str, Image.Image]] = []
+    for uploaded_file in uploaded_files:
+        try:
+            image = Image.open(io.BytesIO(uploaded_file.getvalue())).convert("RGB")
+        except (UnidentifiedImageError, OSError) as error:
+            st.error(f"Could not read {uploaded_file.name}: {error}")
+            continue
+        valid_uploads.append((uploaded_file.name, image))
+
+    if not valid_uploads:
         return
 
     try:
         model, class_names, device = load_model(str(CHECKPOINT_PATH))
         transform = ConvNeXt_Tiny_Weights.DEFAULT.transforms()
         with torch.inference_mode():
-            logits = model(transform(image).unsqueeze(0).to(device))
-            probabilities = torch.softmax(logits, dim=1)[0].cpu().tolist()
+            images = torch.stack(
+                [transform(image) for _, image in valid_uploads]
+            ).to(device)
+            logits = model(images)
+            probabilities = torch.softmax(logits, dim=1).cpu().tolist()
     except (OSError, RuntimeError, ValueError, KeyError) as error:
-        st.error(f"Could not load the model or classify this image: {error}")
+        st.error(f"Could not load the model or classify the images: {error}")
         return
 
-    predicted_index = max(range(len(probabilities)), key=probabilities.__getitem__)
-    predicted_class = class_names[predicted_index]
-    confidence = probabilities[predicted_index]
+    for (filename, image), image_probabilities in zip(valid_uploads, probabilities):
+        predicted_index = max(
+            range(len(image_probabilities)), key=image_probabilities.__getitem__
+        )
+        predicted_class = class_names[predicted_index]
+        confidence = image_probabilities[predicted_index]
 
-    image_column, result_column = st.columns([1, 1])
-    with image_column:
-        st.image(image, caption=uploaded_file.name, width=500)
-    with result_column:
-        st.subheader("Prediction")
-        st.success(f"{predicted_class} — {confidence:.1%} confidence")
-        st.write("Class probabilities")
-        for class_name, probability in zip(class_names, probabilities):
-            st.progress(probability, text=f"{class_name}: {probability:.1%}")
+        with st.container(border=True):
+            image_column, result_column = st.columns([1, 1])
+            with image_column:
+                st.image(image, caption=filename, width=500)
+            with result_column:
+                st.subheader("Prediction")
+                st.success(f"{predicted_class} — {confidence:.1%} confidence")
+                st.write("Class probabilities")
+                for class_name, probability in zip(class_names, image_probabilities):
+                    st.progress(probability, text=f"{class_name}: {probability:.1%}")
 
 
 if __name__ == "__main__":
