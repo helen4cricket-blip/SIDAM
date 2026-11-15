@@ -336,6 +336,16 @@ def main() -> None:
         "This model predicts only these two categories. It does not estimate damage "
         "severity or assess whether a building is safe."
     )
+    st.info(
+        "**Satellite or drone data sharing**\n\n"
+        "If you would like to discuss sharing satellite or drone imagery for "
+        "research, please contact Helen Pokkayil Eldho at "
+        "[H.PokkayilEldho@massey.ac.nz](mailto:H.PokkayilEldho@massey.ac.nz) "
+        "or Dr Chandana Siriwardana at "
+        "[C.Siriwardana@massey.ac.nz](mailto:C.Siriwardana@massey.ac.nz). "
+        "Please ensure that you are authorized to share the data and that any "
+        "required permissions are in place."
+    )
 
     if not CHECKPOINT_PATH.is_file():
         st.error(f"Model checkpoint not found: {CHECKPOINT_PATH}")
