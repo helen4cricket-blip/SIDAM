@@ -132,14 +132,14 @@ h1, h2, h3 {
 }
 
 [data-testid="stMain"] h1 {
-    font-size: clamp(1rem, 2.5vw, 2.25rem) !important;
+    font-size: clamp(1rem, 2.8vw, 2.5rem) !important;
     line-height: 1.2;
     white-space: nowrap;
 }
 
 .sidam-acronym {
     color: var(--magenta);
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     line-height: 1.2;
