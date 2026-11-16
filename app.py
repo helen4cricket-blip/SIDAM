@@ -333,8 +333,10 @@ def main() -> None:
         "**Undamaged Building**."
     )
     st.warning(
-        "This model predicts only these two categories. It does not estimate damage "
-        "severity or assess whether a building is safe."
+        "This model predicts only these two categories. Displayed percentages are "
+        "whole-image class probabilities, not the proportions of a building's area "
+        "that are damaged or undamaged. It does not estimate damage severity or "
+        "assess whether a building is safe."
     )
     st.info(
         "**Satellite or drone data sharing**\n\n"
@@ -415,8 +417,13 @@ def main() -> None:
                 st.image(image, caption=filename, width=500)
             with result_column:
                 st.subheader("Prediction")
-                st.success(f"{predicted_class} — {confidence:.1%} confidence")
-                st.write("Class probabilities")
+                st.success(
+                    f"Whole-image prediction: {predicted_class} — "
+                    f"{confidence:.1%} confidence"
+                )
+                st.write(
+                    "Whole-image class probabilities (not building-area percentages)"
+                )
                 for class_name, probability in zip(class_names, image_probabilities):
                     st.progress(probability, text=f"{class_name}: {probability:.1%}")
 
